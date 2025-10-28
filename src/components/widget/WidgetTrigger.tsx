@@ -10,8 +10,6 @@ import {
   ChevronLeft, 
   SendHorizontal, 
   MoreVertical,
-  Home,
-  MessageSquare,
   MessageSquareText,
   ExternalLink,
   Archive
@@ -57,8 +55,6 @@ import {
 } from "@/components/ui/avatar";
 import {
   Tabs,
-  TabsList,
-  TabsTrigger,
   TabsContent,
 } from "@/components/ui/tabs";
 
