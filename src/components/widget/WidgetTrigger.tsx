@@ -180,10 +180,10 @@ export const WidgetTrigger = () => {
         
         setMessages(prev => [...prev, authMessage]);
         
-        // Show OTP component in chat after a short delay
+        // Show OTP component in chat after the message animation completes
         setTimeout(() => {
           setShowOtpInChat(true);
-        }, 1000);
+        }, 2000);
       }
     }, 1000);
   };
