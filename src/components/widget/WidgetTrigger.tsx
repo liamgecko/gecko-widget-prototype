@@ -113,6 +113,7 @@ export const WidgetTrigger = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [showConversation, setShowConversation] = useState(false);
+  const [showOtpInChat, setShowOtpInChat] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -130,7 +131,7 @@ export const WidgetTrigger = () => {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
-    setPhase("otp");
+    setPhase("verified");
   }
 
   useEffect(() => {
@@ -153,6 +154,42 @@ export const WidgetTrigger = () => {
     
     setMessages(prev => [...prev, newMessage]);
     setInputValue("");
+    
+    // Mock conversation responses
+    setTimeout(() => {
+      const userMessageCount = messages.filter(m => m.isUser).length + 1; // +1 for the message we just added
+      
+      if (userMessageCount === 1) {
+        // First user message - respond with financial aid hours
+        const response1: Message = {
+          id: (Date.now() + 1).toString(),
+          content: "The financial aid office is open Monday to Friday 8am - 12pm and 2pm - 5pm.",
+          isUser: false
+        };
+        
+        const response2: Message = {
+          id: (Date.now() + 2).toString(),
+          content: "Is there anything else I can help you with?",
+          isUser: false
+        };
+        
+        setMessages(prev => [...prev, response1, response2]);
+      } else if (userMessageCount === 2) {
+        // Second user message - trigger authentication
+        const authMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: "To access that information, we need to authenticate you, we've sent you a code enter it below.",
+          isUser: false
+        };
+        
+        setMessages(prev => [...prev, authMessage]);
+        
+        // Show OTP component in chat after a short delay
+        setTimeout(() => {
+          setShowOtpInChat(true);
+        }, 1000);
+      }
+    }, 1000);
   };
 
   return (
@@ -455,6 +492,62 @@ export const WidgetTrigger = () => {
                                 isUser={message.isUser}
                               />
                             ))}
+                            {showOtpInChat && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="space-y-4 p-4 border rounded-lg bg-white"
+                              >
+                                <div className="space-y-2">
+                                  <Label className="text-sm font-medium">Enter verification code</Label>
+                                  <InputOTP
+                                    maxLength={6}
+                                    value={otp}
+                                    onChange={setOtp}
+                                  >
+                                    <InputOTPGroup>
+                                      <InputOTPSlot index={0} />
+                                      <InputOTPSlot index={1} />
+                                      <InputOTPSlot index={2} />
+                                      <InputOTPSlot index={3} />
+                                      <InputOTPSlot index={4} />
+                                      <InputOTPSlot index={5} />
+                                    </InputOTPGroup>
+                                  </InputOTP>
+                                </div>
+                                <Button 
+                                  className="w-full" 
+                                  size="sm"
+                                  disabled={otp.length !== 6}
+                                  onClick={() => {
+                                    if (otp.length === 6) {
+                                      setIsVerifying(true);
+                                      setTimeout(() => {
+                                        setShowOtpInChat(false);
+                                        setOtp("");
+                                        setIsVerifying(false);
+                                        // Add success message
+                                        const successMessage: Message = {
+                                          id: (Date.now() + 1).toString(),
+                                          content: "Great! You're now authenticated. How can I help you further?",
+                                          isUser: false
+                                        };
+                                        setMessages(prev => [...prev, successMessage]);
+                                      }, 2000);
+                                    }
+                                  }}
+                                >
+                                  {isVerifying ? (
+                                    <>
+                                      <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                                      Verifying...
+                                    </>
+                                  ) : (
+                                    "Verify"
+                                  )}
+                                </Button>
+                              </motion.div>
+                            )}
                           </div>
                         </div>
                         <div className="flex-shrink-0 p-6 pt-0">
@@ -665,27 +758,6 @@ export const WidgetTrigger = () => {
                           </TabsContent>
                         </div>
 
-                        <div className="flex-shrink-0 border-t bg-white p-4">
-                          <TabsList className="w-full grid grid-cols-2 h-auto p-0 bg-transparent gap-2">
-                            <TabsTrigger 
-                              value="home"
-                              className="group flex flex-col items-center data-[state=active]:bg-transparent"
-                            >
-                              <Home className="w-5 h-5 group-data-[state=active]:fill-current" />
-                              <span className="text-sm font-medium">Home</span>
-                            </TabsTrigger>
-                            <TabsTrigger 
-                              value="conversations"
-                              className="group flex flex-col items-center data-[state=active]:bg-transparent"
-                            >
-                              <div className="relative">
-                                <MessageSquare className="w-5 h-5 group-data-[state=active]:fill-current" />
-                                <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-[10px] text-white w-4 h-4 flex items-center justify-center rounded-full">2</span>
-                              </div>
-                              <span className="text-sm font-medium">Conversations</span>
-                            </TabsTrigger>
-                          </TabsList>
-                        </div>
                       </Tabs>
                     )}
                   </motion.div>
