@@ -13,9 +13,6 @@ import {
   Home,
   MessageSquare,
   MessageSquareText,
-  HomeIcon,
-  MessageSquareIcon,
-  ArrowRight,
   ExternalLink,
   Archive
 } from "lucide-react";
@@ -143,7 +140,7 @@ export const WidgetTrigger = () => {
         setPhase("verified");
       }, 2000);
     }
-  }, [otp]);
+  }, [otp, isVerifying]);
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -394,7 +391,7 @@ export const WidgetTrigger = () => {
                     <div>
                       <Label className="text-lg font-bold">Welcome back Liam!</Label>
                       <p className="text-sm text-muted-foreground">
-                        We've sent a verification code to your email. Please enter it below.
+                        We&apos;ve sent a verification code to your email. Please enter it below.
                       </p>
                     </div>
                     <div className="space-y-4 p-6 border rounded">
@@ -577,7 +574,7 @@ export const WidgetTrigger = () => {
                                     </Avatar>
                                     <div className="overflow-hidden">
                                       <div className="flex items-center gap-2">
-                                        <p className="font-medium truncate">Thanks so much for your patience. We'll get back to you as soon as possible.</p>
+                                        <p className="font-medium truncate">Thanks so much for your patience. We&apos;ll get back to you as soon as possible.</p>
                                       </div>
                                       <p className="text-sm text-muted-foreground">Liam Young</p>
                                     </div>
